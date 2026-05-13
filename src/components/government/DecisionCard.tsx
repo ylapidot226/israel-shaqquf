@@ -3,16 +3,18 @@
 import Link from 'next/link'
 import { Calendar, Building2, ExternalLink } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { formatDate, truncate } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
 import type { GovDecision } from '@/lib/government-api'
 
 interface DecisionCardProps {
   decision: GovDecision
+  href?: string
 }
 
-export function DecisionCard({ decision }: DecisionCardProps) {
+export function DecisionCard({ decision, href }: DecisionCardProps) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-[var(--card-border)] bg-[var(--card)] p-4 hover:border-green-400 transition-colors group">
+    <div className="relative flex items-start gap-3 rounded-lg border border-[var(--card-border)] bg-[var(--card)] p-4 hover:border-green-400 transition-colors group">
+      {href && <Link href={href} className="absolute inset-0 rounded-lg" aria-hidden="true" tabIndex={-1} />}
       <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold">
         {decision.gov_num ?? 37}
       </div>
@@ -46,7 +48,7 @@ export function DecisionCard({ decision }: DecisionCardProps) {
               href={decision.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:underline"
+              className="relative z-10 flex items-center gap-1 text-xs text-green-600 dark:text-green-400 hover:underline"
               onClick={(e) => e.stopPropagation()}
             >
               <ExternalLink size={11} />

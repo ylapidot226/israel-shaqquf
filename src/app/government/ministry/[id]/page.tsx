@@ -15,8 +15,9 @@ export default async function MinistryPage({ params }: MinistryPageProps) {
   ])
 
   const ministry = ministries.find((m) => m.ministry_id === id)
+  const hebrewName = ministry?.hebrew_name ?? ''
   const filtered = decisions.filter((d) =>
-    d.ministry_name?.includes(ministry?.hebrew_name?.slice(0, 6) ?? id)
+    hebrewName ? d.ministry_name?.includes(hebrewName) : d.ministry_name?.includes(id)
   )
 
   return (
@@ -44,9 +45,7 @@ export default async function MinistryPage({ params }: MinistryPageProps) {
         ) : (
           <div className="space-y-2">
             {filtered.map((d, i) => (
-              <Link key={d.decision_id ?? i} href={`/government/decision/${d.decision_id ?? i}`}>
-                <DecisionCard decision={d} />
-              </Link>
+              <DecisionCard key={d.decision_id ?? i} decision={d} href={`/government/decision/${d.decision_id ?? i}`} />
             ))}
           </div>
         )}

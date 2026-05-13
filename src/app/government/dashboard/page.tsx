@@ -79,9 +79,7 @@ async function DecisionsList() {
     return (
       <div className="space-y-2">
         {decisions.map((d, i) => (
-          <Link key={d.decision_id ?? i} href={`/government/decision/${d.decision_id ?? i}`}>
-            <DecisionCard decision={d} />
-          </Link>
+          <DecisionCard key={d.decision_id ?? i} decision={d} href={`/government/decision/${d.decision_id ?? i}`} />
         ))}
       </div>
     )

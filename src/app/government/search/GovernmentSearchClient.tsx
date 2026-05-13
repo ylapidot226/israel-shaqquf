@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -68,9 +67,7 @@ export default function GovernmentSearchClient() {
       ) : (
         <div className="space-y-2">
           {results.map((d, i) => (
-            <Link key={d.decision_id ?? i} href={`/government/decision/${d.decision_id ?? i}`}>
-              <DecisionCard decision={d} />
-            </Link>
+            <DecisionCard key={d.decision_id ?? i} decision={d} href={`/government/decision/${d.decision_id ?? i}`} />
           ))}
         </div>
       )}

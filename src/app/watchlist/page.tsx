@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Eye, Trash2, Settings, Bell, Building2, FileText, Users } from 'lucide-react'
+import { Eye, Trash2, Bell, Building2, FileText, Users } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'

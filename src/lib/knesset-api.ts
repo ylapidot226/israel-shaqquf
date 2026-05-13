@@ -76,8 +76,12 @@ export async function fetchRecentBills(top = 20): Promise<KnessetBill[]> {
   })
 }
 
+function toOdataDatetime(iso: string): string {
+  return iso.replace(/\.\d{3}Z$/, '').replace('Z', '')
+}
+
 export async function fetchUpcomingCommitteeSessions(top = 15): Promise<KnessetCommitteeSession[]> {
-  const now = new Date().toISOString()
+  const now = toOdataDatetime(new Date().toISOString())
   return fetchOdata<KnessetCommitteeSession>('KNS_CommitteeSession', {
     $top: String(top),
     $orderby: 'StartDate asc',

@@ -21,6 +21,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="he" dir="rtl" className="h-full">
+      <head>
+        {/* Blocking script prevents FOUC by applying dark class and locale dir before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===null&&d))document.documentElement.classList.add('dark');var l=localStorage.getItem('locale');if(l==='en'){document.documentElement.dir='ltr';document.documentElement.lang='en'}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
         <ThemeProvider>
           <LocaleProvider>

@@ -14,13 +14,17 @@ async function fetchOdata(entity: string, filter?: string) {
   return json?.value ?? []
 }
 
+function toOdataDatetime(iso: string): string {
+  return iso.replace(/\.\d{3}Z$/, '').replace('Z', '')
+}
+
 async function getLastSync(supabase: Awaited<ReturnType<typeof createServiceClient>>, table: string): Promise<string> {
   const { data } = await supabase
     .from('sync_log')
     .select('last_sync_at')
     .eq('table_name', table)
     .single()
-  return data?.last_sync_at ?? '2020-01-01T00:00:00Z'
+  return toOdataDatetime(data?.last_sync_at ?? '2020-01-01T00:00:00')
 }
 
 export async function GET(request: NextRequest) {

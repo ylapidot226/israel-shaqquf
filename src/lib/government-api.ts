@@ -18,51 +18,43 @@ export interface Ministry {
   hebrew_name?: string
 }
 
+// Government 37 decisions tracking dataset from data.gov.il
+const GOV_DECISIONS_RESOURCE_ID = '5b6cd1b1-c553-4838-af7e-c1132e7234f1'
+
 // Fetch recent government decisions from data.gov.il
 export async function fetchGovDecisions(limit = 20, offset = 0): Promise<GovDecision[]> {
-  const url = `${CKAN_API_BASE}/datastore_search?resource_id=https://www.gov.il/he/departments/policies&limit=${limit}&offset=${offset}&sort=date desc`
+  const params = new URLSearchParams({
+    resource_id: GOV_DECISIONS_RESOURCE_ID,
+    limit: String(limit),
+    offset: String(offset),
+    sort: '_id desc',
+  })
+  const url = `${CKAN_API_BASE}/datastore_search?${params}`
 
   try {
-    const res = await fetch(url, { next: { revalidate: 300 } })
+    const res = await fetch(url, { next: { revalidate: 300 }, signal: AbortSignal.timeout(8000) })
     if (!res.ok) throw new Error(`CKAN error: ${res.status}`)
-    const json = await res.json()
-    if (json.success && json.result?.records) {
-      return json.result.records.map(mapCkanDecision)
-    }
-  } catch {
-    // Fall through to scrape fallback
-  }
-
-  // Fallback: try known resource_id for government decisions
-  return fetchGovDecisionsFallback(limit)
-}
-
-async function fetchGovDecisionsFallback(limit = 20): Promise<GovDecision[]> {
-  const resourceId = 'cb8e9e4e-7c6f-41a1-b0ad-5f8f83ee4f65'
-  const url = `${CKAN_API_BASE}/datastore_search?resource_id=${resourceId}&limit=${limit}&sort=date%20desc`
-
-  try {
-    const res = await fetch(url, { next: { revalidate: 300 } })
-    if (!res.ok) return getMockDecisions(limit)
     const json = await res.json()
     if (json.success && json.result?.records?.length) {
       return json.result.records.map(mapCkanDecision)
     }
   } catch {
-    // return mock
+    // Fall through to mock
   }
   return getMockDecisions(limit)
 }
 
 function mapCkanDecision(r: Record<string, unknown>): GovDecision {
+  const decisionNum = String(r['Decision Number ‏'] ?? r.decision_num ?? r.DecisionNum ?? '').trim()
+  const rawId = r._id ?? r.id ?? r.decision_id
   return {
-    decision_id: String(r.id ?? r.decision_id ?? r.DecisionID ?? ''),
-    gov_num: Number(r.gov_num ?? r.GovNum ?? 37),
-    decision_num: String(r.decision_num ?? r.DecisionNum ?? r.Number ?? ''),
-    title: String(r.title ?? r.Title ?? r.name ?? ''),
-    date: String(r.date ?? r.Date ?? ''),
-    ministry_name: String(r.ministry_name ?? r.Ministry ?? r.office ?? ''),
-    summary: String(r.summary ?? r.Summary ?? r.description ?? ''),
+    decision_id: rawId != null && String(rawId) !== '' ? String(rawId) : undefined,
+    gov_num: 37,
+    decision_num: decisionNum,
+    title: String(r['Name Of Government Decision'] ?? r.title ?? r.Title ?? '').trim(),
+    date: String(r['Date Published'] ?? r.date ?? r.Deadline ?? '').split(' ')[0],
+    ministry_name: String(r['Responsible Unit'] ?? r.ministry_name ?? r.Ministry ?? '').trim(),
+    summary: String(r.Task ?? r.summary ?? r.Summary ?? '').trim(),
     url: String(r.url ?? r.Url ?? ''),
     tags: [],
   }
