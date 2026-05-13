@@ -2,11 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/sync-knesset",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/sync-government",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/cron/generate-embeddings",
