@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-knesset",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/sync-government",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/generate-embeddings",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/notifications/digest",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}

@@ -1,7 +1,21 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: 'knesset.gov.il' },
+      { protocol: 'https', hostname: '**.gov.il' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+    ],
+  },
+  async headers() {
+    return [
+      {
+        source: '/api/cron/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      },
+    ]
+  },
+}
 
-export default nextConfig;
+export default nextConfig

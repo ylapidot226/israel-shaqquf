@@ -2,25 +2,63 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  --card: #f8fafc;
+  --card-border: #e2e8f0;
+  --muted: #64748b;
+  --knesset: #1d4ed8;
+  --knesset-light: #dbeafe;
+  --government: #16a34a;
+  --government-light: #dcfce7;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f1f5f9;
+  --card: #1e293b;
+  --card-border: #334155;
+  --muted: #94a3b8;
+  --knesset: #3b82f6;
+  --knesset-light: #1e3a5f;
+  --government: #22c55e;
+  --government-light: #14532d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
 }
+
+[dir="rtl"] {
+  font-family: 'Segoe UI', 'Arial Hebrew', system-ui, sans-serif;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--card) 25%, var(--card-border) 50%, var(--card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.375rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.module-knesset { --accent: var(--knesset); --accent-light: var(--knesset-light); }
+.module-government { --accent: var(--government); --accent-light: var(--government-light); }
+
+.accent-border { border-color: var(--accent); }
+.accent-bg { background-color: var(--accent-light); }
+.accent-text { color: var(--accent); }
