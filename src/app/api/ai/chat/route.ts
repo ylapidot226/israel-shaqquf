@@ -89,8 +89,7 @@ ${contextText || 'לא נמצאו נתונים רלוונטיים. השתמש ב
       })),
     })
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('AI chat error:', msg)
-    return NextResponse.json({ error: 'שגיאה בעיבוד השאלה', detail: msg }, { status: 500 })
+    console.error('AI chat error:', err instanceof Error ? err.message : String(err))
+    return NextResponse.json({ error: 'שגיאה בעיבוד השאלה' }, { status: 500 })
   }
 }
