@@ -1,6 +1,5 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { fetchBillsByPerson, BILL_STATUS } from '@/lib/knesset-api'
 import { BillCard } from '@/components/knesset/BillCard'
@@ -32,7 +31,7 @@ export default async function MKPage({ params }: MKPageProps) {
     )
   }
 
-  const name = mk.Name ?? `${mk.FirstName ?? ''} ${mk.LastName ?? ''}`.trim()
+  const name = `${mk.FirstName ?? ''} ${mk.LastName ?? ''}`.trim() || `חכ #${id}`
 
   return (
     <div className="module-knesset mx-auto max-w-4xl px-4 py-6 md:px-6">
@@ -51,9 +50,6 @@ export default async function MKPage({ params }: MKPageProps) {
           <div className="mt-2 flex flex-wrap gap-2">
             {mk.IsCurrent && <Badge variant="green">חבר כנסת נוכחי</Badge>}
             {mk.GenderID === 2 && <Badge variant="gray">חברת כנסת</Badge>}
-            {mk.FactionID && (
-              <Badge variant="blue">סיעה #{mk.FactionID}</Badge>
-            )}
           </div>
         </div>
       </div>

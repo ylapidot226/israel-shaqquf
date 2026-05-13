@@ -108,13 +108,12 @@ export default function KnessetSearchClient() {
               className="flex items-center gap-3 rounded-lg border border-[var(--card-border)] bg-[var(--card)] p-3 hover:border-blue-400 transition-colors"
             >
               <div className="h-9 w-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-sm font-bold shrink-0">
-                {(p.Name ?? p.FirstName ?? '?').charAt(0)}
+                {(p.FirstName ?? '?').charAt(0)}
               </div>
               <div>
-                <p className="font-medium text-sm text-[var(--foreground)]">{p.Name ?? `${p.FirstName} ${p.LastName}`}</p>
+                <p className="font-medium text-sm text-[var(--foreground)]">{`${p.FirstName ?? ''} ${p.LastName ?? ''}`.trim()}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   {p.IsCurrent && <Badge variant="green">נוכחי</Badge>}
-                  {p.FactionID && <span className="text-xs text-[var(--muted)]">סיעה #{p.FactionID}</span>}
                 </div>
               </div>
             </Link>

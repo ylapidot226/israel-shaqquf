@@ -19,7 +19,7 @@ function getBillStatusVariant(statusId: number): 'blue' | 'green' | 'red' | 'yel
 }
 
 export function BillCard({ bill }: BillCardProps) {
-  const statusLabel = bill.StatusDesc ?? BILL_STATUS[bill.StatusID] ?? String(bill.StatusID)
+  const statusLabel = BILL_STATUS[bill.StatusID] ?? String(bill.StatusID)
   const statusVariant = getBillStatusVariant(bill.StatusID)
 
   return (

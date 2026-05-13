@@ -110,7 +110,7 @@ async function CommitteesList() {
     if (!sessions.length) return <p className="text-sm text-[var(--muted)] p-2">אין ישיבות קרובות</p>
     return (
       <div className="space-y-2">
-        {sessions.map((s) => <CommitteeSessionCard key={s.SessionID} session={s} />)}
+        {sessions.map((s) => <CommitteeSessionCard key={s.CommitteeSessionID} session={s} />)}
       </div>
     )
   } catch {

@@ -15,11 +15,11 @@ export function AgendaItemCard({ item }: AgendaItemCardProps) {
           {item.Name}
         </p>
         <div className="mt-1.5 flex items-center gap-2 flex-wrap">
-          {item.StatusDesc && <Badge variant="gray">{item.StatusDesc}</Badge>}
-          {item.Date && (
+          {item.SubTypeDesc && <Badge variant="gray">{item.SubTypeDesc}</Badge>}
+          {item.LastUpdatedDate && (
             <span className="flex items-center gap-1 text-xs text-[var(--muted)]">
               <Calendar size={11} />
-              {formatDate(item.Date)}
+              {formatDate(item.LastUpdatedDate)}
             </span>
           )}
         </div>

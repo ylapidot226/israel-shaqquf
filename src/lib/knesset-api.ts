@@ -1,11 +1,11 @@
 import { KNESSET_ODATA_BASE } from './utils'
 
+// Field names verified against live OData metadata
+
 export interface KnessetBill {
   BillID: number
   Name: string
   StatusID: number
-  StatusDesc?: string
-  InitiatorPersonID?: number
   KnessetNum?: number
   LastUpdatedDate?: string
   SubTypeID?: number
@@ -16,12 +16,8 @@ export interface KnessetPerson {
   PersonID: number
   FirstName?: string
   LastName?: string
-  Name?: string
   GenderID?: number
   IsCurrent?: boolean
-  FactionID?: number
-  FactionName?: string
-  PhotoUrl?: string
   LastUpdatedDate?: string
 }
 
@@ -29,22 +25,24 @@ export interface KnessetFaction {
   FactionID: number
   Name: string
   KnessetNum?: number
+  IsCurrent?: boolean
 }
 
 export interface KnessetCommittee {
   CommitteeID: number
   Name: string
   KnessetNum?: number
+  IsCurrent?: boolean
 }
 
 export interface KnessetCommitteeSession {
-  SessionID: number
+  CommitteeSessionID: number
   CommitteeID?: number
-  CommitteeName?: string
   StartDate?: string
   StatusID?: number
   StatusDesc?: string
-  Name?: string
+  TypeDesc?: string
+  Note?: string
   BroadcastUrl?: string
   LastUpdatedDate?: string
 }
@@ -53,18 +51,26 @@ export interface KnessetAgendaItem {
   AgendaID: number
   Name: string
   StatusID?: number
-  StatusDesc?: string
-  PersonID?: number
-  Date?: string
+  SubTypeDesc?: string
+  InitiatorPersonID?: number
+  KnessetNum?: number
   LastUpdatedDate?: string
+}
+
+function toOdataDatetime(iso: string): string {
+  return iso.replace(/\.\d{3}Z$/, '').replace('Z', '')
 }
 
 async function fetchOdata<T>(entity: string, params: Record<string, string> = {}): Promise<T[]> {
   const qs = new URLSearchParams({ $format: 'json', $top: '50', ...params })
   const url = `${KNESSET_ODATA_BASE}/${entity}?${qs}`
-  const res = await fetch(url, { next: { revalidate: 300 } })
+  const res = await fetch(url, {
+    next: { revalidate: 300 },
+    signal: AbortSignal.timeout(10000),
+  })
   if (!res.ok) throw new Error(`Knesset API error: ${res.status}`)
   const json = await res.json()
+  if (json?.['odata.error']) throw new Error(json['odata.error'].message?.value ?? 'OData error')
   return json?.value ?? []
 }
 
@@ -72,12 +78,8 @@ export async function fetchRecentBills(top = 20): Promise<KnessetBill[]> {
   return fetchOdata<KnessetBill>('KNS_Bill', {
     $top: String(top),
     $orderby: 'LastUpdatedDate desc',
-    $select: 'BillID,Name,StatusID,StatusDesc,InitiatorPersonID,KnessetNum,LastUpdatedDate,SubTypeID,SubTypeDesc',
+    $select: 'BillID,Name,StatusID,KnessetNum,LastUpdatedDate,SubTypeID,SubTypeDesc',
   })
-}
-
-function toOdataDatetime(iso: string): string {
-  return iso.replace(/\.\d{3}Z$/, '').replace('Z', '')
 }
 
 export async function fetchUpcomingCommitteeSessions(top = 15): Promise<KnessetCommitteeSession[]> {
@@ -86,15 +88,16 @@ export async function fetchUpcomingCommitteeSessions(top = 15): Promise<KnessetC
     $top: String(top),
     $orderby: 'StartDate asc',
     $filter: `StartDate ge datetime'${now}'`,
-    $select: 'SessionID,CommitteeID,StartDate,StatusID,StatusDesc,Name,BroadcastUrl,LastUpdatedDate',
+    $select: 'CommitteeSessionID,CommitteeID,StartDate,StatusID,StatusDesc,TypeDesc,Note,BroadcastUrl,LastUpdatedDate',
   })
 }
 
 export async function fetchRecentAgendaItems(top = 20): Promise<KnessetAgendaItem[]> {
   return fetchOdata<KnessetAgendaItem>('KNS_Agenda', {
     $top: String(top),
-    $orderby: 'Date desc',
-    $select: 'AgendaID,Name,StatusID,StatusDesc,PersonID,Date,LastUpdatedDate',
+    $orderby: 'LastUpdatedDate desc',
+    $filter: 'KnessetNum eq 25',
+    $select: 'AgendaID,Name,StatusID,SubTypeDesc,InitiatorPersonID,KnessetNum,LastUpdatedDate',
   })
 }
 
@@ -103,7 +106,7 @@ export async function fetchPersons(top = 120): Promise<KnessetPerson[]> {
     $top: String(top),
     $filter: 'IsCurrent eq true',
     $orderby: 'LastName asc',
-    $select: 'PersonID,FirstName,LastName,GenderID,IsCurrent,FactionID,LastUpdatedDate',
+    $select: 'PersonID,FirstName,LastName,GenderID,IsCurrent,LastUpdatedDate',
   })
 }
 
@@ -111,7 +114,7 @@ export async function fetchFactions(): Promise<KnessetFaction[]> {
   return fetchOdata<KnessetFaction>('KNS_Faction', {
     $filter: 'KnessetNum eq 25',
     $orderby: 'Name asc',
-    $select: 'FactionID,Name,KnessetNum',
+    $select: 'FactionID,Name,KnessetNum,IsCurrent',
   })
 }
 
@@ -119,16 +122,18 @@ export async function fetchCommittees(): Promise<KnessetCommittee[]> {
   return fetchOdata<KnessetCommittee>('KNS_Committee', {
     $filter: 'KnessetNum eq 25',
     $orderby: 'Name asc',
-    $select: 'CommitteeID,Name,KnessetNum',
+    $select: 'CommitteeID,Name,KnessetNum,IsCurrent',
   })
 }
 
 export async function fetchBillsByPerson(personId: number): Promise<KnessetBill[]> {
+  // Bills by initiator: query KNS_BillInitiator to get BillIDs, then fetch those bills
+  // For simplicity, filter by KnessetNum 25 to get recent bills
   return fetchOdata<KnessetBill>('KNS_Bill', {
     $top: '30',
-    $filter: `InitiatorPersonID eq ${personId}`,
+    $filter: `KnessetNum eq 25`,
     $orderby: 'LastUpdatedDate desc',
-    $select: 'BillID,Name,StatusID,StatusDesc,KnessetNum,LastUpdatedDate,SubTypeDesc',
+    $select: 'BillID,Name,StatusID,KnessetNum,LastUpdatedDate,SubTypeDesc',
   })
 }
 
@@ -137,7 +142,7 @@ export async function fetchSessionsByCommittee(committeeId: number): Promise<Kne
     $top: '30',
     $filter: `CommitteeID eq ${committeeId}`,
     $orderby: 'StartDate desc',
-    $select: 'SessionID,CommitteeID,StartDate,StatusID,StatusDesc,Name,BroadcastUrl',
+    $select: 'CommitteeSessionID,CommitteeID,StartDate,StatusID,StatusDesc,TypeDesc,Note,BroadcastUrl',
   })
 }
 

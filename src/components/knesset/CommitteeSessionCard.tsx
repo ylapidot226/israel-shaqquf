@@ -29,7 +29,7 @@ export function CommitteeSessionCard({ session }: CommitteeSessionCardProps) {
           {!isPast && <Badge variant="blue">קרוב</Badge>}
         </div>
         <p className="mt-1 text-sm font-medium text-[var(--foreground)] leading-snug line-clamp-2">
-          {session.Name ?? `ישיבת ועדה ${session.CommitteeID}`}
+          {session.TypeDesc ?? session.Note ?? `ישיבת ועדה ${session.CommitteeID}`}
         </p>
         {session.StartDate && (
           <p className="mt-1 flex items-center gap-1 text-xs text-[var(--muted)]">

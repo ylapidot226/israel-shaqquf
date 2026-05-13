@@ -53,7 +53,7 @@ async function SessionsList({ committeeId }: { committeeId: number }) {
     if (!sessions.length) return <p className="text-sm text-[var(--muted)]">לא נמצאו ישיבות</p>
     return (
       <div className="space-y-2">
-        {sessions.map((s) => <CommitteeSessionCard key={s.SessionID} session={s} />)}
+        {sessions.map((s) => <CommitteeSessionCard key={s.CommitteeSessionID} session={s} />)}
       </div>
     )
   } catch {
