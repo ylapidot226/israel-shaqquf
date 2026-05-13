@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useRef, useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Send, MessageSquare, ExternalLink, RefreshCw, Database } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -178,7 +179,9 @@ export default function ChatPage() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    <div className="prose prose-sm dark:prose-invert max-w-none text-[var(--foreground)] [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ps-4 [&_ol]:list-decimal [&_ol]:ps-4 [&_li]:mb-0.5">
+                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                    </div>
                     {msg.sources && msg.sources.length > 0 && (
                       <div className="mt-3 pt-2 border-t border-[var(--card-border)]">
                         <p className="text-xs text-[var(--muted)] mb-1.5">{isRTL ? '📚 מקורות:' : '📚 Sources:'}</p>
